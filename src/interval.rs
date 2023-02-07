@@ -26,6 +26,18 @@ pub struct Interval {
     pub semitones: u8,
 }
 
+impl From<u8> for Interval {
+    fn from(value: u8) -> Interval {
+        Interval::from_semitones(value)
+    }
+}
+
+impl From<Interval> for u8 {
+    fn from(value: Interval) -> u8 {
+        value.to_semitones()
+    }
+}
+
 impl Interval {
     pub fn new(size: IntervalSize, quality: IntervalQuality) -> Self {
         let semitones = match (size, quality) {
@@ -181,5 +193,27 @@ mod tests {
 
         let interval = Interval::new(IntervalSize::Fifth, IntervalQuality::Diminished);
         assert_eq!(interval.to_semitones(), 6);
+    }
+
+    #[test]
+    fn implicit_conversion_from_u8_to_interval() {
+        let interval: Interval = 2.into();
+        assert_eq!(interval.size, IntervalSize::Second);
+        assert_eq!(interval.quality, IntervalQuality::Major);
+
+        let interval: Interval = 6.into();
+        assert_eq!(interval.size, IntervalSize::Fifth);
+        assert_eq!(interval.quality, IntervalQuality::Diminished);
+    }
+
+    #[test]
+    fn implicit_conversion_from_interval_to_u8() {
+        let interval = Interval::new(IntervalSize::Second, IntervalQuality::Major);
+        let semitones: u8 = interval.into();
+        assert_eq!(semitones, 2);
+
+        let interval = Interval::new(IntervalSize::Fifth, IntervalQuality::Diminished);
+        let semitones: u8 = interval.into();
+        assert_eq!(semitones, 6);
     }
 }
